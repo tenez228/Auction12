@@ -1,9 +1,8 @@
-package vn.edu.auction.domain.item.item;
+package vn.edu.auction.domain.item;
 
 import java.util.Objects;
 import java.util.UUID;
 import vn.edu.auction.domain.Entity;
-import vn.edu.auction.domain.item.ItemType;
 
 /**
  * Thông tin sản phẩm. Giá và thời gian thuộc Auction.

@@ -1,6 +1,4 @@
-package vn.edu.auction.domain.item.item;
-
-import vn.edu.auction.domain.item.ItemType;
+package vn.edu.auction.domain.item;
 
 import java.util.UUID;
 

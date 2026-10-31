@@ -1,4 +1,4 @@
-package vn.edu.auction.domain.item.item;
+package vn.edu.auction.domain.item;
 
 /** Ba loại sản phẩm trong bài tập. */
 public enum ItemType {
