@@ -1,4 +1,5 @@
 // File: src/main/java/com/auction/model/user/User.java
+//test commit
 package com.auction.model.user;
 
 import java.io.Serializable;
