@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="vn.edu.auction.ui.controller.AuctionListController" styleClass="app-background">
+  <top>
+    <VBox spacing="14" styleClass="header">
+      <padding><Insets top="20" right="24" bottom="18" left="24"/></padding>
+      <HBox spacing="16" alignment="CENTER_LEFT">
+        <VBox spacing="3">
+          <Label text="Auction12" styleClass="brand"/>
+          <Label text="Đấu giá minh bạch, cập nhật tức thời" styleClass="muted"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="Mở cửa sổ khác" onAction="#handleNewWindow"/>
+        <Button text="Đăng xuất" onAction="#handleLogout"/>
+      </HBox>
+      <HBox spacing="14" alignment="CENTER_LEFT">
+        <Label fx:id="userLabel" styleClass="user-label"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label text="DEMO / Dữ liệu trong bộ nhớ" styleClass="badge"/>
+      </HBox>
+    </VBox>
+  </top>
+  <center>
+    <SplitPane dividerPositions="0.58" styleClass="content-split">
+      <items>
+        <VBox spacing="14" minWidth="470">
+          <padding><Insets top="22" right="16" bottom="18" left="24"/></padding>
+          <HBox spacing="12" alignment="CENTER_LEFT">
+            <Label text="Phiên đấu giá" styleClass="section-title"/>
+            <Label fx:id="countLabel" text="0 phiên" styleClass="muted"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="createButton" text="+ Tạo phiên" onAction="#handleCreate" styleClass="primary"/>
+          </HBox>
+          <TextField fx:id="searchField" promptText="Tìm theo tên sản phẩm..."/>
+          <TableView fx:id="auctionTable" VBox.vgrow="ALWAYS">
+            <columns>
+              <TableColumn fx:id="nameColumn" text="Sản phẩm" prefWidth="190" minWidth="130"/>
+              <TableColumn fx:id="priceColumn" text="Giá hiện tại" prefWidth="140" minWidth="115"/>
+              <TableColumn fx:id="stateColumn" text="Trạng thái" prefWidth="150" minWidth="115"/>
+              <TableColumn fx:id="endColumn" text="Kết thúc" prefWidth="145" minWidth="125"/>
+            </columns>
+          </TableView>
+          <Label fx:id="updatedLabel" text="Đang tải..." styleClass="muted"/>
+          <Label text="Mở cửa sổ khác để thử hai bidder trong cùng ứng dụng." wrapText="true" styleClass="demo-note"/>
+        </VBox>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" minWidth="350" styleClass="detail-scroll">
+          <content>
+            <VBox spacing="10" minWidth="330" styleClass="detail-card">
+              <padding><Insets top="22" right="22" bottom="24" left="22"/></padding>
+              <Label fx:id="selectionLabel" text="Chọn một phiên" wrapText="true" styleClass="section-title"/>
+              <Label fx:id="stateLabel" styleClass="badge"/>
+              <Label text="GIÁ HIỆN TẠI" styleClass="eyebrow"/>
+              <Label fx:id="priceLabel" text="--" styleClass="price"/>
+              <Label fx:id="remainingLabel" styleClass="countdown"/>
+              <Label fx:id="detailsLabel" wrapText="true" styleClass="muted"/>
+              <Label fx:id="ownerLabel" wrapText="true"/>
+              <Label fx:id="startLabel"/>
+              <Label fx:id="endLabel"/>
+              <Label fx:id="leaderLabel" wrapText="true"/>
+              <Label fx:id="winnerLabel" wrapText="true"/>
+              <Separator/>
+              <Label text="Đặt giá (VND nguyên đồng)"/>
+              <HBox spacing="10">
+                <TextField fx:id="amountField" promptText="Ví dụ: 1100000" onAction="#handleBid" HBox.hgrow="ALWAYS"/>
+                <Button fx:id="bidButton" text="Đặt giá" onAction="#handleBid" styleClass="primary"/>
+              </HBox>
+              <Label fx:id="messageLabel" minHeight="40" wrapText="true"/>
+              <HBox spacing="8">
+                <Button fx:id="paidButton" text="Xác nhận thanh toán" onAction="#handlePaid"/>
+                <Button fx:id="cancelButton" text="Hủy phiên" onAction="#handleCancel"/>
+              </HBox>
+              <TextField fx:id="reasonField" promptText="Lý do hủy phiên đã kết thúc"/>
+              <Separator/>
+              <Label text="Lịch sử đặt giá (30 lượt gần nhất)" styleClass="subheading"/>
+              <TextArea fx:id="historyArea" editable="false" wrapText="true" prefRowCount="6"/>
+            </VBox>
+          </content>
+        </ScrollPane>
+      </items>
+    </SplitPane>
+  </center>
+</BorderPane>
