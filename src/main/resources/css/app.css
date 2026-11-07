@@ -1,0 +1,36 @@
+.root { -fx-font-family: "Segoe UI"; -fx-font-size: 13px; -fx-text-fill: #172b42; }
+.app-background { -fx-background-color: #f3f6fa; }
+.label { -fx-text-fill: #172b42; }
+.card { -fx-background-color: white; -fx-background-radius: 16; -fx-border-color: #e1e7ef; -fx-border-radius: 16; }
+.header { -fx-background-color: white; -fx-border-color: transparent transparent #dee5ee transparent; }
+.brand { -fx-font-size: 25px; -fx-font-weight: bold; }
+.page-title { -fx-font-size: 30px; -fx-font-weight: bold; }
+.section-title { -fx-font-size: 21px; -fx-font-weight: bold; }
+.subheading { -fx-font-weight: bold; }
+.eyebrow { -fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #40617c; }
+.muted { -fx-text-fill: #62758b; }
+.badge { -fx-background-color: #e8f0fa; -fx-text-fill: #285d8b; -fx-padding: 5 10; -fx-background-radius: 5; }
+.user-label { -fx-font-weight: bold; }
+.demo-note { -fx-font-size: 12px; -fx-text-fill: #62758b; }
+.error { -fx-text-fill: #b42318; }
+.price { -fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #155d4d; }
+.countdown { -fx-text-fill: #8c5a17; -fx-font-weight: bold; }
+.button { -fx-background-color: #edf2f7; -fx-text-fill: #243e58; -fx-padding: 10 14; -fx-background-radius: 7; -fx-cursor: hand; }
+.button:hover { -fx-background-color: #e0e8f1; }
+.button.primary { -fx-background-color: #215fba; -fx-text-fill: white; -fx-font-weight: bold; }
+.button.primary:hover { -fx-background-color: #174f9e; }
+.button:disabled { -fx-opacity: 0.45; }
+.text-field, .text-area { -fx-background-color: white; -fx-border-color: #ccd6e2; -fx-border-radius: 6; -fx-background-radius: 6; }
+.text-field { -fx-padding: 10 12; }
+.text-field:focused, .text-area:focused { -fx-border-color: #4387db; }
+.table-view { -fx-background-color: white; -fx-border-color: #e0e6ef; -fx-border-radius: 8; }
+.table-view .column-header-background, .table-view .column-header { -fx-background-color: #edf2f7; }
+.table-view .column-header .label { -fx-padding: 10 4; -fx-font-weight: bold; }
+.table-row-cell { -fx-cell-size: 48px; -fx-background-color: white; }
+.table-row-cell:odd { -fx-background-color: #fafbfd; }
+.table-row-cell:selected { -fx-background-color: #e2edfc; }
+.table-row-cell:selected .text { -fx-fill: #173a67; }
+.table-cell { -fx-alignment: CENTER-LEFT; -fx-padding: 9 10; }
+.content-split { -fx-background-color: transparent; -fx-padding: 0; }
+.split-pane-divider { -fx-background-color: #e0e6ef; -fx-padding: 0 1; }
+.detail-card, .detail-scroll, .detail-scroll > .viewport { -fx-background-color: white; }

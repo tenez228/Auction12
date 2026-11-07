@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<StackPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="vn.edu.auction.ui.controller.LoginController" styleClass="app-background">
+  <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+  <VBox alignment="CENTER_LEFT" spacing="10" maxWidth="480" maxHeight="-Infinity" styleClass="card">
+    <padding><Insets top="24" right="30" bottom="24" left="30"/></padding>
+    <Label text="AUCTION12 / TUẦN 7" styleClass="eyebrow"/>
+    <Label text="Chào mừng trở lại" styleClass="page-title"/>
+    <Label text="Đăng nhập để xem và tham gia các phiên đấu giá." wrapText="true" styleClass="muted"/>
+    <VBox spacing="7">
+      <Label text="Tên đăng nhập"/>
+      <TextField fx:id="usernameField" promptText="Ví dụ: bidder01" onAction="#handleLogin"/>
+    </VBox>
+    <VBox spacing="7">
+      <Label text="Mật khẩu"/>
+      <PasswordField fx:id="passwordField" promptText="Mật khẩu demo: demo123" onAction="#handleLogin"/>
+    </VBox>
+    <HBox spacing="14" alignment="CENTER_LEFT">
+      <Button fx:id="loginButton" text="Đăng nhập" onAction="#handleLogin" defaultButton="true" styleClass="primary" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS"/>
+      <ProgressIndicator fx:id="progressIndicator" prefWidth="25" prefHeight="25" visible="false"/>
+    </HBox>
+    <Label fx:id="errorLabel" wrapText="true" minHeight="34" styleClass="error"/>
+    <Separator/>
+    <Label text="Tài khoản: bidder01, bidder02, seller01, admin01&#10;Mật khẩu chung: demo123" wrapText="true" styleClass="demo-note"/>
+    <Label text="Bản thực hành cục bộ. Dữ liệu sẽ mất khi đóng ứng dụng." wrapText="true" styleClass="muted"/>
+  </VBox>
+</StackPane>
