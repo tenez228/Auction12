@@ -9,7 +9,7 @@
 **Bài tập lớn môn Lập trình Nâng cao - Trường Đại học Công nghệ - ĐHQGHN**  
 **Giai đoạn Tuần 7: Đa luồng, Observer Pattern & Giao diện JavaFX**
 
-[Mô tả](#mô-tả-hệ-thống) • [Công nghệ](#công-nghệ-sử-dụng) • [Cài đặt](#cài-đặt-và-yêu-cầu-hệ-thống) • [Chạy ứng dụng](#hướng-dẫn-chạy-ứng-dụng) • [Tính năng](#danh-sách-chức-năng-hiện-tại-tuần-7) • [Design Patterns](#design-patterns-áp-dụng)
+[Mô tả](#mô-tả-hệ-thống) • [Công nghệ](#công-nghệ-sử-dụng) • [Cấu trúc Thư mục](#cấu-trúc-thư-mục) • [Cài đặt & Chạy](#cài-đặt-và-hướng-dẫn-chạy) • [Chức năng Đã làm](#danh-sách-chức-năng-đã-hoàn-thành-tuần-7) • [Design Patterns](#design-patterns-áp-dụng)
 
 </div>
 
@@ -48,14 +48,126 @@
 
 ---
 
-## Cài đặt và Yêu cầu Hệ thống
+## Cấu trúc Thư mục
 
-### Yêu cầu
+Dưới đây là cây thư mục thực tế đầy đủ của dự án:
+
+```
+Auction12/
+├── docs/
+│   └── week7/                      # Tài liệu thiết kế, quyết định kỹ thuật & đối chiếu
+│       ├── ARCHITECTURE.md         # Luồng hoạt động, xử lý đa luồng & Observer
+│       ├── CHANGES.md              # Chi tiết thay đổi mã nguồn Tuần 7
+│       ├── DECISIONS.md            # Các quyết định thiết kế hệ thống
+│       ├── MANUAL_TESTS.md         # Hướng dẫn và checklist kiểm thử thủ công
+│       ├── POM-MERGE.md            # Hướng dẫn tích hợp cấu hình Maven & JavaFX
+│       ├── TASKS.md                # Bảng đối chiếu các nhiệm vụ Tuần 7
+│       └── VERIFICATION.md         # Báo cáo kết quả kiểm thử và độ bao phủ
+│
+├── src/
+│   ├── main/
+│   │   ├── java/vn/edu/auction/
+│   │   │   ├── application/        # Tầng nghiệp vụ ứng dụng & dịch vụ
+│   │   │   │   ├── auth/           # Xác thực tài khoản demo & quản lý phiên
+│   │   │   │   │   ├── DemoAuthService.java
+│   │   │   │   │   ├── UserProfile.java
+│   │   │   │   │   └── UserSession.java
+│   │   │   │   ├── AuctionManager.java          # Registry quản lý danh mục phiên đấu giá
+│   │   │   │   ├── AuctionScheduler.java        # Bộ lập lịch cập nhật trạng thái tự động
+│   │   │   │   ├── AuctionService.java          # Interface nghiệp vụ cho UI
+│   │   │   │   ├── AuctionView.java             # DTO bất biến trả về cho tầng hiển thị
+│   │   │   │   └── DefaultAuctionService.java   # Triển khai dịch vụ với synchronized & observer
+│   │   │   │
+│   │   │   ├── bootstrap/          # Khởi tạo DI, ứng dụng JavaFX & Demo console
+│   │   │   │   ├── AppContext.java              # Quản lý vòng đời dịch vụ & nạp dữ liệu mẫu
+│   │   │   │   ├── AuctionApplication.java      # Điểm khởi chạy chính của JavaFX GUI
+│   │   │   │   ├── AuctionLauncher.java         # Launcher phụ
+│   │   │   │   ├── AuctionManagerDemo.java      # Demo quản lý phiên
+│   │   │   │   ├── AuctionServiceDemo.java      # Demo dịch vụ đấu giá
+│   │   │   │   ├── DomainDemo.java              # Demo domain model
+│   │   │   │   └── UserDemo.java                # Demo user
+│   │   │   │
+│   │   │   ├── domain/             # Mô hình nghiệp vụ cốt lõi (Domain Model)
+│   │   │   │   ├── Entity.java                  # Lớp trừu tượng cơ sở quản lý ID và equals
+│   │   │   │   ├── auction/                     # Nghiệp vụ phiên đấu giá & Observer
+│   │   │   │   │   ├── event/                   # Hệ thống phân phối sự kiện (Observer Pattern)
+│   │   │   │   │   │   ├── AuctionEvent.java
+│   │   │   │   │   │   ├── AuctionEventType.java
+│   │   │   │   │   │   ├── AuctionObserver.java
+│   │   │   │   │   │   └── Subscription.java
+│   │   │   │   │   ├── Auction.java             # Quản lý phiên đấu giá, ReentrantLock, đặt giá
+│   │   │   │   │   ├── AuctionSnapshot.java     # Bản sao bất biến trạng thái phiên
+│   │   │   │   │   ├── AuctionStatus.java       # Enum: OPEN, RUNNING, FINISHED, PAID, CANCELED
+│   │   │   │   │   └── BidTransaction.java      # Giao dịch đặt giá hợp lệ
+│   │   │   │   ├── factory/                     # Factory Method khởi tạo sản phẩm
+│   │   │   │   │   ├── ArtFactory.java
+│   │   │   │   │   ├── ElectronicsFactory.java
+│   │   │   │   │   ├── ItemFactory.java
+│   │   │   │   │   └── VehicleFactory.java
+│   │   │   │   ├── item/                        # Thực thể sản phẩm đấu giá
+│   │   │   │   │   ├── Art.java
+│   │   │   │   │   ├── Electronics.java
+│   │   │   │   │   ├── Item.java
+│   │   │   │   │   ├── ItemType.java
+│   │   │   │   │   └── Vehicle.java
+│   │   │   │   └── user/                        # Thực thể người dùng & phân quyền
+│   │   │   │       ├── Admin.java
+│   │   │   │       ├── Bidder.java
+│   │   │   │       ├── Seller.java
+│   │   │   │       ├── User.java
+│   │   │   │       └── UserRole.java
+│   │   │   │
+│   │   │   └── ui/                 # Giao diện đồ họa người dùng JavaFX (MVC View & Controller)
+│   │   │       ├── controller/     # Điều khiển giao diện
+│   │   │       │   ├── AuctionListController.java
+│   │   │       │   ├── CreateAuctionDialog.java
+│   │   │       │   └── LoginController.java
+│   │   │       ├── model/          # Mô hình hiển thị cho UI
+│   │   │       │   ├── AuctionRow.java          # Wrapper dòng bảng kèm version check
+│   │   │       │   └── UiFormats.java           # Định dạng hiển thị tiền VND & thời gian
+│   │   │       └── AppWindow.java               # Quản lý cửa sổ và chuyển đổi Scene
+│   │   │
+│   │   └── resources/
+│   │       ├── css/
+│   │       │   └── app.css                      # Định dạng stylesheet giao diện
+│   │       └── fxml/
+│   │           ├── auction-list-view.fxml       # Layout màn hình danh sách & đặt giá
+│   │           └── login-view.fxml              # Layout màn hình đăng nhập
+│   │
+│   └── test/java/vn/edu/auction/   # Bộ kiểm thử tự động độc lập (Standalone Self-Tests)
+│       ├── application/
+│       │   ├── AuctionManagerSelfTest.java      # Kiểm thử Registry
+│       │   ├── AuctionServiceSelfTest.java      # Kiểm thử Service
+│       │   └── Week7SelfTest.java               # Kiểm thử đa luồng, concurrency & observer
+│       ├── domain/
+│       │   ├── user/
+│       │   │   └── UserModelSelfTest.java       # Kiểm thử người dùng & phân quyền
+│       │   └── DomainModelSelfTest.java         # Kiểm thử toàn diện logic đặt giá & trạng thái
+│       └── ui/
+│           ├── AuctionUiSmokeTest.java          # Kiểm thử cơ bản UI
+│           └── Week7UiSmokeTest.java            # Kiểm thử luồng tự động giao diện JavaFX
+│
+├── check-week7.cmd                 # Script kiểm tra nhanh trên Windows CMD
+├── check-week7.ps1                 # Script kiểm tra nhanh trên PowerShell
+├── check-week7.sh                  # Script kiểm tra nhanh trên Linux / macOS
+├── pom.xml                         # Cấu hình Maven chuẩn (build, test, javafx:run)
+├── pom-week7.xml                   # Cấu hình Maven Tuần 7 (dự phòng, đồng nhất với pom.xml)
+├── sources-domain.txt              # Danh sách file nguồn Domain phục vụ compile nhanh
+├── sources-manager.txt             # Danh sách file nguồn Manager
+├── sources-week7.txt               # Danh sách toàn bộ file nguồn Tuần 7
+└── README.md                       # Tài liệu hướng dẫn dự án duy nhất
+```
+
+---
+
+## Cài đặt và Hướng dẫn Chạy
+
+### Yêu cầu Hệ thống
 - **JDK 21** trở lên ([Tải JDK 21](https://www.oracle.com/java/technologies/javase/jdk21-archive-downloads.html))
 - **Maven 3.8+** ([Tải Maven](https://maven.apache.org/download.cgi))
 - **Hệ điều hành**: Windows 10/11, macOS, Linux
 
-### Kiểm tra nhanh (Không cần cài Maven)
+### 1. Kiểm tra nhanh (Không cần cài Maven)
 
 Dự án cung cấp sẵn kịch bản biên dịch và chạy trọn vẹn bộ kiểm thử Java độc lập:
 
@@ -75,74 +187,27 @@ Dự án cung cấp sẵn kịch bản biên dịch và chạy trọn vẹn bộ
   sh check-week7.sh
   ```
 
-### Chạy Unit / Self-Test với Maven
+---
+
+### 2. Chạy Kiểm thử với Maven
 
 ```bash
 cd Auction12
 mvn clean test
-# Hoặc chỉ định rõ file pom của Tuần 7:
-mvn -f pom-week7.xml clean test
 ```
 
 ---
 
-## Cấu trúc Thư mục
-
-```
-Auction12/
-├── src/
-│   ├── main/
-│   │   ├── java/vn/edu/auction/
-│   │   │   ├── application/        # Tầng dịch vụ ứng dụng (Service Layer)
-│   │   │   │   ├── auth/           # Xác thực phiên (DemoAuthService, UserSession)
-│   │   │   │   ├── AuctionManager.java    # Registry quản lý danh mục phiên đấu giá
-│   │   │   │   ├── AuctionScheduler.java  # Bộ lập lịch cập nhật trạng thái tự động
-│   │   │   │   ├── AuctionService.java    # Interface nghiệp vụ cho UI
-│   │   │   │   ├── DefaultAuctionService.java # Triển khai nghiệp vụ với synchronized & observer
-│   │   │   │   └── AuctionView.java       # DTO bất biến cung cấp cho UI
-│   │   │   ├── bootstrap/          # Khởi tạo ứng dụng & dữ liệu mẫu
-│   │   │   │   ├── AppContext.java        # Khởi tạo DI container và dịch vụ hệ thống
-│   │   │   │   ├── AuctionApplication.java# Điểm khởi chạy JavaFX UI
-│   │   │   │   └── Week7Demo.java         # Bản demo console tương tác thời gian thực
-│   │   │   ├── domain/             # Tầng mô hình nghiệp vụ cốt lõi (Domain Model)
-│   │   │   │   ├── auction/        # Auction, BidTransaction, AuctionStatus
-│   │   │   │   │   └── event/      # Observer Pattern: AuctionObserver, AuctionEvent, Subscription
-│   │   │   │   ├── factory/        # Factory Method: ItemFactory, Art/Electronics/VehicleFactory
-│   │   │   │   ├── item/           # Thực thể sản phẩm: Item, Art, Electronics, Vehicle
-│   │   │   │   └── user/           # Thực thể người dùng: User, Bidder, Seller, Admin
-│   │   │   └── ui/                 # Tầng hiển thị giao diện đồ họa JavaFX
-│   │   │       ├── controller/     # LoginController, AuctionListController, CreateAuctionDialog
-│   │   │       └── model/          # AuctionRow (chống hiển thị lùi version), UiFormats
-│   │   └── resources/
-│   │       ├── fxml/               # login-view.fxml, auction-list-view.fxml
-│   │       └── css/                # app.css
-│   └── test/java/vn/edu/auction/   # Bộ kiểm thử tự động độc lập (Standalone Self-Tests)
-│       ├── application/            # AuctionManagerSelfTest, Week7SelfTest
-│       ├── domain/                 # DomainModelSelfTest, UserModelSelfTest
-│       └── ui/                     # Week7UiSmokeTest (kiểm thử GUI tự động)
-├── docs/week7/                     # Tài liệu thiết kế, quyết định kiến trúc & đối chiếu
-├── check-week7.cmd / .ps1 / .sh    # Script chạy kiểm thử nhanh
-├── pom.xml                         # Cấu hình Maven chuẩn của dự án
-└── README.md                       # Tài liệu hướng dẫn dự án
-```
-
----
-
-## Hướng dẫn Chạy Ứng dụng
-
-### Khởi động Giao diện JavaFX
-
-Mở terminal tại thư mục `Auction12` và thực thi lệnh sau:
+### 3. Khởi động Giao diện JavaFX
 
 ```bash
 cd Auction12
-mvn -f pom-week7.xml javafx:run
+mvn javafx:run
 ```
-*(Nếu dùng `pom.xml` mặc định, bạn có thể chạy trực tiếp `mvn javafx:run`)*
 
 ---
 
-### Tài khoản Demo Thử nghiệm
+### 4. Tài khoản Demo Thử nghiệm
 
 Hệ thống được nạp sẵn các tài khoản demo để thử nghiệm đầy đủ các vai trò:
 
@@ -155,9 +220,9 @@ Hệ thống được nạp sẵn các tài khoản demo để thử nghiệm đ
 
 ---
 
-### Trải nghiệm Tính năng Real-time với Nhiều Người dùng
+### 5. Thử nghiệm Tính năng Real-time với Nhiều Người dùng
 
-1. Khởi động ứng dụng và đăng nhập bằng tài khoản `bidder01`.
+1. Khởi động ứng dụng bằng lệnh `mvn javafx:run` và đăng nhập tài khoản `bidder01`.
 2. Trên màn hình chính, nhấn nút **"Mở cửa sổ khác"**.
 3. Tại cửa sổ mới xuất hiện, đăng nhập bằng tài khoản `bidder02`.
 4. Cả hai cửa sổ cùng chọn một phiên đấu giá đang diễn ra (`RUNNING`).
@@ -165,7 +230,7 @@ Hệ thống được nạp sẵn các tài khoản demo để thử nghiệm đ
 
 ---
 
-## Danh sách Chức năng Hiện tại (Tuần 7)
+## Danh sách Chức năng Đã hoàn thành (Tuần 7)
 
 Dưới đây là các tính năng **đã hoàn thành thực tế** trong mã nguồn dự án:
 
@@ -232,15 +297,6 @@ Dưới đây là các tính năng **đã hoàn thành thực tế** trong mã n
 - **Màn hình giao diện**: 2 FXML views (`login-view`, `auction-list-view`) + 1 Dialog FXML
 - **Bộ kiểm thử tự động**: 5 bộ Self-Test chuyên sâu (156 checks pass 100%)
 - **Mức độ hoàn thành Tuần 7**: 6/6 yêu cầu đề bài.
-
----
-
-## Kế hoạch Phát triển Tiếp theo (Tuần sau)
-
-- [ ] Chuyển đổi kiến trúc sang **Client-Server phân tán qua TCP/IP Socket**.
-- [ ] Xây dựng hệ thống giao thức mạng JSON (Message Protocol) giữa Client và Server.
-- [ ] Tích hợp cơ sở dữ liệu để lưu trữ lâu dài (Persistence Layer).
-- [ ] Bổ sung các tính năng nâng cao: Đấu giá tự động (Auto-Bidding), Chống đấu giá phút chót (Anti-Sniping).
 
 ---
 
