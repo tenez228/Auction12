@@ -21,7 +21,7 @@ import vn.edu.auction.domain.auction.AuctionSnapshot;
  * <p>Singleton có phạm vi một class loader; không chia sẻ bộ nhớ giữa các
  * tiến trình Java khác nhau. Đây không phải một cơ chế phân quyền.
  */
-public final class AuctionManager {
+public final class AuctionManager implements AuctionRepository {
   private final ConcurrentMap<UUID, Auction> auctions = new ConcurrentHashMap<>();
 
   private AuctionManager() {

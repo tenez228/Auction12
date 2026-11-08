@@ -3,7 +3,6 @@ package vn.edu.auction.application.auth;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -17,7 +16,7 @@ import vn.edu.auction.domain.user.User;
  * No registration, durable accounts, password hashing or network authentication.
  * Never put real passwords in this class or use it for a deployed service.
  */
-public final class DemoAuthService implements AutoCloseable {
+public final class DemoAuthService implements AuthService {
   private final Map<String, User> accounts = Map.of(
       "seller01", new Seller("seller01", "Người bán 01"),
       "bidder01", new Bidder("bidder01", "Người đấu giá 01"),
@@ -30,11 +29,12 @@ public final class DemoAuthService implements AutoCloseable {
     if (closed) {
       throw new IllegalStateException("Authentication service is closed.");
     }
-    Objects.requireNonNull(username, "username");
-    Objects.requireNonNull(password, "password");
+    if (username == null || username.isBlank() || password == null || password.length == 0) {
+      throw new AuthenticationException("Vui lòng nhập tên đăng nhập và mật khẩu.");
+    }
     User user = accounts.get(username.strip());
     if (user == null || !Arrays.equals(password, "demo123".toCharArray())) {
-      throw new SecurityException("Sai tên đăng nhập hoặc mật khẩu.");
+      throw new AuthenticationException("Sai tên đăng nhập hoặc mật khẩu.");
     }
     UUID token = UUID.randomUUID();
     sessions.put(token, user);
@@ -42,10 +42,12 @@ public final class DemoAuthService implements AutoCloseable {
   }
 
   public User requireUser(UserSession session) {
-    Objects.requireNonNull(session, "session");
+    if (session == null) {
+      throw new AuthenticationException("Vui lòng đăng nhập để tiếp tục.");
+    }
     User user = sessions.get(session.token());
     if (closed || user == null) {
-      throw new SecurityException("Phiên đăng nhập không còn hiệu lực.");
+      throw new AuthenticationException("Phiên đăng nhập không còn hiệu lực.");
     }
     return user;
   }

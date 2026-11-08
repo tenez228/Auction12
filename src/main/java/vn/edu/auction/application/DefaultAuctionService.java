@@ -5,7 +5,6 @@ import java.time.Clock;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -15,7 +14,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import vn.edu.auction.application.auth.DemoAuthService;
+import vn.edu.auction.application.auth.AuthService;
+import vn.edu.auction.application.exception.AuctionNotFoundException;
+import vn.edu.auction.domain.exception.AuthorizationException;
+import vn.edu.auction.domain.exception.DataValidationException;
+import vn.edu.auction.domain.exception.InvalidAuctionStateException;
 import vn.edu.auction.application.auth.UserSession;
 import vn.edu.auction.domain.auction.Auction;
 import vn.edu.auction.domain.auction.AuctionSnapshot;
@@ -30,15 +33,15 @@ import vn.edu.auction.domain.user.User;
 /** Application operations. UI receives views, never mutable Auction instances. */
 public final class DefaultAuctionService implements AuctionService {
   private static final Logger LOGGER = Logger.getLogger(DefaultAuctionService.class.getName());
-  private final AuctionManager manager;
-  private final DemoAuthService auth;
+  private final AuctionRepository manager;
+  private final AuthService auth;
   private final Clock clock;
   private final ConcurrentMap<UUID, Item> itemsByAuction = new ConcurrentHashMap<>();
   private final ConcurrentMap<UUID, Subscription> subscriptions = new ConcurrentHashMap<>();
   private final CopyOnWriteArrayList<ViewObserver> observers = new CopyOnWriteArrayList<>();
   private volatile boolean closed;
 
-  public DefaultAuctionService(AuctionManager manager, DemoAuthService auth, Clock clock) {
+  public DefaultAuctionService(AuctionRepository manager, AuthService auth, Clock clock) {
     this.manager = Objects.requireNonNull(manager, "manager");
     this.auth = Objects.requireNonNull(auth, "auth");
     this.clock = Objects.requireNonNull(clock, "clock");
@@ -48,9 +51,11 @@ public final class DefaultAuctionService implements AuctionService {
   public AuctionView createAuction(
       UserSession session, Item item, BigDecimal price, Instant start, Instant end) {
     User actor = requireUser(session);
-    Objects.requireNonNull(item, "item");
+    if (item == null || price == null || start == null || end == null) {
+      throw new DataValidationException("Thiếu sản phẩm, giá hoặc thời gian phiên.");
+    }
     if (!(actor instanceof Seller) || !actor.getId().equals(item.getSellerId())) {
-      throw new SecurityException("Chỉ người bán sở hữu sản phẩm được tạo phiên.");
+      throw new AuthorizationException("Chỉ người bán sở hữu sản phẩm được tạo phiên.");
     }
     Auction auction;
     // Creation checks and insertion share one monitor across service instances.
@@ -61,7 +66,7 @@ public final class DefaultAuctionService implements AuctionService {
       Objects.requireNonNull(start, "start");
       Objects.requireNonNull(end, "end");
       if (!end.isAfter(now)) {
-        throw new IllegalArgumentException("Giờ kết thúc phải ở tương lai.");
+        throw new DataValidationException("Giờ kết thúc phải ở tương lai.");
       }
       boolean active = manager.getAuctions().stream().anyMatch(existing -> {
         AuctionStatus status = existing.getStatus();
@@ -70,7 +75,7 @@ public final class DefaultAuctionService implements AuctionService {
             && now.isBefore(existing.getEndTime());
       });
       if (active) {
-        throw new IllegalStateException("Sản phẩm đã có một phiên chưa kết thúc.");
+        throw new InvalidAuctionStateException("Sản phẩm đã có một phiên chưa kết thúc.");
       }
       auction = new Auction(item, price, start, end, clock);
       Subscription subscription = auction.addObserver(event -> publish(
@@ -115,7 +120,7 @@ public final class DefaultAuctionService implements AuctionService {
   public BidTransaction placeBid(UserSession session, UUID auctionId, BigDecimal amount) {
     User actor = requireUser(session);
     if (!(actor instanceof Bidder bidder)) {
-      throw new SecurityException("Chỉ Bidder được đặt giá.");
+      throw new AuthorizationException("Chỉ Bidder được đặt giá.");
     }
     return ownedAuction(auctionId).placeBid(bidder, amount);
   }
@@ -193,9 +198,11 @@ public final class DefaultAuctionService implements AuctionService {
   }
 
   private Auction ownedAuction(UUID id) {
-    Objects.requireNonNull(id, "auctionId");
+    if (id == null) {
+      throw new DataValidationException("Vui lòng chọn một phiên đấu giá.");
+    }
     if (!itemsByAuction.containsKey(id)) {
-      throw new NoSuchElementException("Không tìm thấy phiên trong ứng dụng.");
+      throw new AuctionNotFoundException();
     }
     return manager.getAuction(id);
   }
